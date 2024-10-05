@@ -28,7 +28,7 @@ deno-link-shortener/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/deno-link-shortener.git
+   git clone https://github.com/PrakharDoneria/IEC-Link-Shortner.git
    cd deno-link-shortener
    ```
 
@@ -62,4 +62,4 @@ deno-link-shortener/
   }
   ```
 
-- **GET `/abc123`**: Visiting the shortened URL (e.g., `http://localhost:8000/abc123`) will redirect you to the original URL (e.g., `https://example.com`).
+- **GET `/abc123`**: Visiting the shortened URL (e.g., `http://localhost:8000/abc123`) will redirect you to the original URL (e.g., `[https://example.com](https://github.com/PrakharDoneria/IEC-Link-Shortner)`).
