@@ -4,8 +4,8 @@ const kv = await Deno.openKv();
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "*",
-  "Access-Control-Allow-Headers": "*",
+  "Access-Control-Allow-Methods": "*",  // Allow all methods
+  "Access-Control-Allow-Headers": "*",  // Allow all headers
 };
 
 serve(async (req) => {
@@ -16,29 +16,21 @@ serve(async (req) => {
   }
 
   if (req.method === "POST" && url.pathname === "/shorten") {
-    const { url: longUrl } = await req.json();
-
-    // Check if the long URL contains ".deno.dev"
-    if (longUrl.includes(".deno.dev")) {
-      return new Response("Error: Long URL cannot contain '.deno.dev'", { status: 400, headers: corsHeaders });
-    }
-
-    // Check if the long URL already exists
-    const existingEntry = await kv.get(["urls", longUrl]);
-    if (existingEntry.value) {
-      const shortId = existingEntry.value.shortId;
-      return new Response(JSON.stringify({ shortId }), {
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
-    }
-
-    // Generate a new short ID
+    const { url } = await req.json();
     const shortId = crypto.randomUUID().slice(0, 6);
-    await kv.set(["urls", longUrl], { shortId, url: longUrl });
+    await kv.set(["urls", shortId], { url });
 
     return new Response(JSON.stringify({ shortId }), {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
+  }
+
+  if (req.method === "GET" && url.pathname === "/clean") {
+    const iterator = kv.list({ prefix: ["urls"] });
+    for await (const entry of iterator) {
+      await kv.delete(entry.key);
+    }
+    return new Response("Database cleared", { status: 200, headers: corsHeaders });
   }
 
   if (req.method === "GET" && url.pathname.startsWith("/")) {
